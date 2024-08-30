@@ -29,3 +29,15 @@ def lambda_handler(event, context):
 # Open the Keychain Access application on your Mac.
 # Search for github.com.
 # Delete any entries related to github.com.
+
+
+
+
+
+# git pull origin main --no-rebase
+# git push origin main
+
+
+
+# git pull origin main --rebase
+# git push origin main
