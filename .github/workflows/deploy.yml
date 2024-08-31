@@ -22,7 +22,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
 
     - name: Zip Lambda function
-      run: zip lambda_function.zip src/main.py
+      run: zip infrastructure/lambda_function.zip src/main.py
 
     - name: Initialize Terraform
       run: terraform init

@@ -1,13 +1,5 @@
 provider "aws" {
-  region = "us-west-2"
-}
-
-resource "aws_lambda_function" "my_lambda" {
-  function_name = "my_lambda_function"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.8"
-  role          = aws_iam_role.lambda_exec.arn
-  filename      = "lambda_function.zip"
+  region = "us-east-1"
 }
 
 resource "aws_iam_role" "lambda_exec" {
@@ -31,6 +23,15 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_lambda_function" "my_lambda" {
+  function_name = "my_lambda_function"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.8"
+  filename      = "${path.module}/lambda_function.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda_function.zip")
+}
+
 resource "aws_api_gateway_rest_api" "my_api" {
   name        = "MyAPI"
   description = "API Gateway to trigger Lambda"
@@ -45,7 +46,7 @@ resource "aws_api_gateway_resource" "my_resource" {
 resource "aws_api_gateway_method" "my_method" {
   rest_api_id   = aws_api_gateway_rest_api.my_api.id
   resource_id   = aws_api_gateway_resource.my_resource.id
-  http_method   = "POST"
+  http_method   = "GET"
   authorization = "NONE"
 }
 
@@ -58,7 +59,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   uri         = aws_lambda_function.my_lambda.invoke_arn
 }
 
-resource "aws_lambda_permission" "apigw" {
+resource "aws_lambda_permission" "api_gateway" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.my_lambda.function_name
